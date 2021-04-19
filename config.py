@@ -1,0 +1,11 @@
+# "nsfw[]: 0"
+# "types[]: image"
+# "types[]: video"
+# "types[]: gallery"
+# "slider: 0"
+# "jsload: 1"
+# "q: hidori+rose"
+# "_: 1618803676327"
+
+ROOT_URL = "https://nsfw.xxx"
+host_config = "?nsfw%5B%5D=0&types%5B%5D=image&types%5B%5D=video&types%5B%5D=gallery&slider=1&jsload=1"
