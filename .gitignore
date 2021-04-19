@@ -1,2 +1,5 @@
-output
+output/**/*.jpg
+output/**/*.jpeg
+output/**/*.png
+output/**/*.mp4
 __pycache__
