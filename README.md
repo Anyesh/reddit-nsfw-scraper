@@ -1,6 +1,6 @@
 <p align="center">
   <a href=#">
-    <img width="180" src="./assets/NSFW.jpg">
+    <img width="180" src="./assets/nsfw.png">
   </a>
 </p>
 
