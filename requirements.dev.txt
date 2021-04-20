@@ -1,0 +1,8 @@
+-r requirements.txt
+
+pytest
+black
+mypy
+pre-commit
+flake8
+isort
