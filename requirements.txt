@@ -1,2 +1,5 @@
 beautifulsoup4
 requests
+argh
+rich
+loguru
