@@ -4,7 +4,9 @@ from pathlib import Path
 
 import requests
 from bs4 import BeautifulSoup
-from tqdm import tqdm
+from rich.console import Console
+
+console = Console()
 
 
 class NSFWScraper:
@@ -50,9 +52,15 @@ class NSFWScraper:
 
             return media_url
 
-    def __parse_items(self, soup_data: BeautifulSoup, handle: str) -> BeautifulSoup:
-        items = soup_data.find_all(eval(handle))
+    @staticmethod
+    def __parse_items(soup_data: BeautifulSoup, handle: str) -> BeautifulSoup:
+        items = soup_data.find_all(eval(handle), recursive=False)
         return items
+
+    @staticmethod
+    def __parse_item(soup_data: BeautifulSoup, handle: str) -> BeautifulSoup:
+        item = soup_data.find(eval(handle))
+        return item
 
     def __assemble_url(self, page: int, query: str):
         query_: str = query.replace(" ", "+")
@@ -61,18 +69,21 @@ class NSFWScraper:
         )
 
     def start(self, query: str, max_pages: int = 2):
+        print(f"Scraping total {max_pages} for {query}")
         page: int = 1
-        while page <= max_pages:
-            full_url: str = self.__assemble_url(page, query)
-            print(f"Scraping page: {page} of {query}")
-            soup: BeautifulSoup = self.crawl(full_url)
-            items = self.__parse_items(
-                soup, handle=""""div", {"class": "sh-section__item"}"""
-            )
-            for item in items:
-                media_url = self.__get_media_url(item)
-                if media_url:
-                    filename = self.__save_media(media_url, handle=query)
-                    print(f"Saved: {filename}")
+        with console.status("[bold green] Crawling web page... "):
+            while page <= max_pages:
+                full_url: str = self.__assemble_url(page, query)
+                print(f"Scraping page: {page} of {query}")
+                soup: BeautifulSoup = self.crawl(full_url)
+                items = self.__parse_items(
+                    soup,
+                    handle=""""div", {"class": "sh-section__item col-rt-2 col-xga-3 col-lg-4 col-md-6 col-sm-12"}""",
+                )
+                for item in items:
+                    media_url = self.__get_media_url(item)
+                    if media_url:
+                        filename = self.__save_media(media_url, handle=query)
+                        print(f"Saved: {filename}")
 
-            page += 1
+                page += 1
