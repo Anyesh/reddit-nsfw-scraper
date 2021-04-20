@@ -1,6 +1,7 @@
 import os
 import shutil
 from pathlib import Path
+from typing import Optional
 
 import requests
 from bs4 import BeautifulSoup
@@ -35,8 +36,8 @@ class NSFWScraper:
         soup = BeautifulSoup(raw, "html.parser")
         return soup
 
-    def __get_media_url(self, item: BeautifulSoup):
-        media_url = None
+    def __get_media_url(self, item: BeautifulSoup) -> Optional[str]:
+        media_url: Optional[str] = None
         a_el = item.find("a", {"class": "slider_init_href"})
         if a_el:
             el_source = a_el.get("href")
@@ -45,12 +46,12 @@ class NSFWScraper:
             img_section = media_col.find("div", {"class": "sh-section__image"})
             vid_section = img_section.find("video")
             if vid_section:
-                return vid_section.find("source").get("src")
+                media_url = vid_section.find("source").get("src")
+            else:
+                img_ = img_section.find("img")
+                media_url = img_["src"] if img_ else None
 
-            img_ = img_section.find("img")
-            media_url = img_["src"] if img_ else None
-
-            return media_url
+        return media_url
 
     @staticmethod
     def __parse_items(soup_data: BeautifulSoup, handle: str) -> BeautifulSoup:
@@ -62,13 +63,14 @@ class NSFWScraper:
         item = soup_data.find(eval(handle))
         return item
 
-    def __assemble_url(self, page: int, query: str):
+    def __assemble_url(self, page: int, query: str) -> str:
         query_: str = query.replace(" ", "+")
         return (
             self.url + "/search-page/" + str(page) + self.config + "&q=" + str(query_)
         )
 
-    def start(self, query: str, max_pages: int = 2):
+    # TODO: Use loguru for logging
+    def start(self, query: str, max_pages: int = 2) -> None:
         print(f"Scraping total {max_pages} for {query}")
         page: int = 1
         with console.status("[bold green] Crawling web page... "):
