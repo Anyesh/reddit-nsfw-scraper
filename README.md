@@ -15,7 +15,7 @@
    > pip install -r requirements.txt
 
 2. Run the application
-   > python start_scraper.py --title hidori rose
+   > python start_scraper.py --title="hidori rose" --max-pages=10
 
 # Output
 
