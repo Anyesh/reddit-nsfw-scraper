@@ -1,5 +1,6 @@
 import os
 import shutil
+from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import Optional
 
@@ -10,10 +11,25 @@ from rich.console import Console
 console = Console()
 
 
+class Crawler(ABC):
+    @abstractmethod
+    def crawl(self, url: str) -> BeautifulSoup:
+        pass
+
+
+class RequestsCrawler(Crawler):
+    @staticmethod
+    def crawl(url: str) -> BeautifulSoup:
+        raw = requests.get(url).text
+        soup = BeautifulSoup(raw, "html.parser")
+        return soup
+
+
 class NSFWScraper:
     def __init__(self, url, config) -> None:
         self.url = url
         self.config = config
+        self.crawler: Crawler = RequestsCrawler()
 
     def __save_media(self, media_url: str, handle: str):
         Path(f"output/{handle.replace(' ', '_')}").mkdir(parents=True, exist_ok=True)
@@ -27,21 +43,12 @@ class NSFWScraper:
                     shutil.copyfileobj(r.raw, f)
         return local_filename
 
-    def __next(self):
-        pass
-
-    @staticmethod
-    def crawl(url: str) -> BeautifulSoup:
-        raw = requests.get(url).text
-        soup = BeautifulSoup(raw, "html.parser")
-        return soup
-
     def __get_media_url(self, item: BeautifulSoup) -> Optional[str]:
         media_url: Optional[str] = None
         a_el = item.find("a", {"class": "slider_init_href"})
         if a_el:
             el_source = a_el.get("href")
-            soup = self.crawl(el_source)
+            soup = self.crawler.crawl(el_source)
             media_col = soup.find("div", {"class": "col-lg-6 sh-section__item stamp"})
             img_section = media_col.find("div", {"class": "sh-section__image"})
             vid_section = img_section.find("video")
@@ -58,11 +65,6 @@ class NSFWScraper:
         items = soup_data.find_all(eval(handle), recursive=False)
         return items
 
-    @staticmethod
-    def __parse_item(soup_data: BeautifulSoup, handle: str) -> BeautifulSoup:
-        item = soup_data.find(eval(handle))
-        return item
-
     def __assemble_url(self, page: int, query: str) -> str:
         query_: str = query.replace(" ", "+")
         return (
@@ -77,7 +79,7 @@ class NSFWScraper:
             while page <= max_pages:
                 full_url: str = self.__assemble_url(page, query)
                 print(f"Scraping page: {page} of {query}")
-                soup: BeautifulSoup = self.crawl(full_url)
+                soup: BeautifulSoup = self.crawler.crawl(full_url)
                 items = self.__parse_items(
                     soup,
                     handle=""""div", {"class": "sh-section__item col-rt-2 col-xga-3 col-lg-4 col-md-6 col-sm-12"}""",
