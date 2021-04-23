@@ -3,3 +3,4 @@ requests
 argh
 rich
 loguru
+pydrive
