@@ -1,10 +1,10 @@
 import argh
 
 from config import ROOT_URL, host_config
-from src.Scraper import NSFWScraper
+from nsfw_scraper.Scraper import NSFWScraper
 
 
-@argh.arg("--title", "-t", help="Title to scrape the reddit.")
+@argh.arg("--title", "-t", help="Title to scrape the reddit.", required=True)
 @argh.arg("--max-pages", "-p", help="Max # pages to scrape.")
 def main(title: str = "hidori rose", max_pages: int = 5) -> None:
     nsfw_scraper = NSFWScraper(url=ROOT_URL, config=host_config)
