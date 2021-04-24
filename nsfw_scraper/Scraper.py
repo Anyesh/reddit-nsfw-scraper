@@ -30,17 +30,25 @@ class NSFWScraper:
         self.url = url
         self.config = config
         self.crawler: Crawler = RequestsCrawler()
+        self.output_path = Path.cwd()
 
     def __save_media(self, media_url: str, handle: str):
-        Path(f"output/{handle.replace(' ', '_')}").mkdir(parents=True, exist_ok=True)
-        local_filename = (
-            Path("output") / handle.replace(" ", "_") / media_url.split("/")[-1]
+
+        Path(f"{self.output_path}/{handle.replace(' ', '_')}").mkdir(
+            parents=True, exist_ok=True
         )
 
-        if not os.path.exists(local_filename):
-            with requests.get(media_url, stream=True) as r:
-                with open(local_filename, "wb") as f:
-                    shutil.copyfileobj(r.raw, f)
+        local_filename = (
+            Path(self.output_path) / handle.replace(" ", "_") / media_url.split("/")[-1]
+        )
+        try:
+
+            if not os.path.exists(local_filename):
+                with requests.get(media_url, stream=True) as r:
+                    with open(local_filename, "wb") as f:
+                        shutil.copyfileobj(r.raw, f)
+        except Exception as e:
+            print("Error: ", e)
         return local_filename
 
     def __get_media_url(self, item: BeautifulSoup) -> Optional[str]:
