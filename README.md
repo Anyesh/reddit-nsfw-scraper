@@ -20,3 +20,9 @@
 # Output
 
 All the outputs are stored in output directory with the corresponding title.
+
+# Run directly on console
+
+> pip install https+https://github.com/Anyesh/reddit-nsfw-scraper@master#egg=nsfw-scraper
+
+> nsfw-scraper --title="hidori rose"
