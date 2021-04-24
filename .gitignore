@@ -8,3 +8,6 @@ __pycache__
 *.log
 
 *_secrets.json
+*.log
+*.egg
+*.egg-info/
