@@ -12,8 +12,9 @@ console = Console()
 
 
 class Crawler(ABC):
+    @staticmethod
     @abstractmethod
-    def crawl(self, url: str) -> BeautifulSoup:
+    def crawl(url: str) -> BeautifulSoup:
         pass
 
 
