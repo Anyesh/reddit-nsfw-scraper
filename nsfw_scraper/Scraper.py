@@ -22,8 +22,7 @@ class RequestsCrawler(Crawler):
     @staticmethod
     def crawl(url: str) -> BeautifulSoup:
         raw = requests.get(url).text
-        soup = BeautifulSoup(raw, "html.parser")
-        return soup
+        return BeautifulSoup(raw, "html.parser")
 
 
 class NSFWScraper:
@@ -54,14 +53,12 @@ class NSFWScraper:
 
     def __get_media_url(self, item: BeautifulSoup) -> Optional[str]:
         media_url: Optional[str] = None
-        a_el = item.find("a", {"class": "slider_init_href"})
-        if a_el:
+        if a_el := item.find("a", {"class": "slider_init_href"}):
             el_source = a_el.get("href")
             soup = self.crawler.crawl(el_source)
             media_col = soup.find("div", {"class": "col-lg-6 sh-section__item stamp"})
             img_section = media_col.find("div", {"class": "sh-section__image"})
-            vid_section = img_section.find("video")
-            if vid_section:
+            if vid_section := img_section.find("video"):
                 media_url = vid_section.find("source").get("src")
             else:
                 img_ = img_section.find("img")
@@ -71,14 +68,11 @@ class NSFWScraper:
 
     @staticmethod
     def __parse_items(soup_data: BeautifulSoup, handle: str) -> BeautifulSoup:
-        items = soup_data.find_all(eval(handle), recursive=False)
-        return items
+        return soup_data.find_all(eval(handle), recursive=False)
 
     def __assemble_url(self, page: int, query: str) -> str:
         query_: str = query.replace(" ", "+")
-        return (
-            self.url + "/search-page/" + str(page) + self.config + "&q=" + str(query_)
-        )
+        return f"{self.url}/search-page/{page}{self.config}&q={query_}"
 
     # TODO: Use loguru for logging
     def start(self, query: str, max_pages: int = 2) -> None:
@@ -94,8 +88,7 @@ class NSFWScraper:
                     handle=""""div", {"class": "sh-section__item col-rt-2 col-xga-3 col-lg-4 col-md-6 col-sm-12"}""",
                 )
                 for item in items:
-                    media_url = self.__get_media_url(item)
-                    if media_url:
+                    if media_url := self.__get_media_url(item):
                         filename = self.__save_media(media_url, handle=query)
                         print(f"Saved: {filename}")
 
